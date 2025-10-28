@@ -3,6 +3,10 @@ output kubeconfig {
   sensitive = true
 }
 
+output id {
+  value = rhcs_break_glass_credential.rosa_break_glass_credential.id
+}
+
 output username {
   value = rhcs_break_glass_credential.rosa_break_glass_credential.username
 }

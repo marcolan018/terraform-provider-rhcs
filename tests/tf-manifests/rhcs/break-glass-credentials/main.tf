@@ -15,7 +15,7 @@ provider "rhcs" {
 }
 
 resource rhcs_break_glass_credential rosa_break_glass_credential {
-  cluster             = var.cluster_id
+  cluster             = var.cluster
   expiration_duration = var.expiration_duration
   username            = var.username
 }

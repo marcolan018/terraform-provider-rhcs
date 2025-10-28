@@ -13,6 +13,7 @@ type BreakGlassCredentialArgs struct {
 
 type BreakGlassCredential struct {
 	Cluster             string `json:"cluster,omitempty"`
+	ID                  string `json:"id,omitempty"`
 	Username            string `json:"username,omitempty"`
 	ExpirationDuration  string `json:"expiration_duration,omitempty"`
 	ExpirationTimestamp string `json:"expiration_timestamp,omitempty"`
@@ -20,15 +21,11 @@ type BreakGlassCredential struct {
 	Status              string `json:"status,omitempty"`
 	Kubeconfig          string `json:"kubeconfig,omitempty"`
 }
-type BreakGlassCredentials struct {
-	BreakGlassCredentials []*BreakGlassCredential `json:"break_glass_credentials,omitempty"`
-}
-
 type BreakGlassCredentialService interface {
 	Init() error
 	Plan(args *BreakGlassCredentialArgs) (string, error)
 	Apply(args *BreakGlassCredentialArgs) (string, error)
-	Output() ([]*BreakGlassCredential, error)
+	Output() (*BreakGlassCredential, error)
 	Destroy() (string, error)
 
 	ReadTFVars() (*BreakGlassCredentialArgs, error)
@@ -42,7 +39,7 @@ type breakGlassCredentialService struct {
 
 func NewBreakGlassCredentialService(tfWorkspace string, clusterType constants.ClusterType) (BreakGlassCredentialService, error) {
 	svc := &breakGlassCredentialService{
-		tfExecutor: NewTerraformExecutor(tfWorkspace, manifests.GetKubeletConfigManifestsDir(clusterType)),
+		tfExecutor: NewTerraformExecutor(tfWorkspace, manifests.GetBreakGlassCredentialManifestsDir(clusterType)),
 	}
 	err := svc.Init()
 	return svc, err
@@ -61,13 +58,13 @@ func (svc *breakGlassCredentialService) Apply(args *BreakGlassCredentialArgs) (s
 	return svc.tfExecutor.RunTerraformApply(args)
 }
 
-func (svc *breakGlassCredentialService) Output() ([]*BreakGlassCredential, error) {
-	output := &BreakGlassCredentials{}
+func (svc *breakGlassCredentialService) Output() (*BreakGlassCredential, error) {
+	output := &BreakGlassCredential{}
 	err := svc.tfExecutor.RunTerraformOutputIntoObject(&output)
 	if err != nil {
 		return nil, err
 	}
-	return output.BreakGlassCredentials, nil
+	return output, nil
 }
 
 func (svc *breakGlassCredentialService) Destroy() (string, error) {
