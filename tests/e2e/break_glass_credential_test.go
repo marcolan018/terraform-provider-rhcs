@@ -40,12 +40,13 @@ var _ = Describe("Break Glass Credential", ci.Day2, ci.FeatureBreakGlassCredenti
 	})
 
 	AfterEach(func() {
-		bgcService.Destroy()
+		if bgcService != nil {
+			bgcService.Destroy()
+		}
 	})
 
 	It("Verify break glass credential can be created/imported - [id:break-glass-credential-01]", ci.Day2, ci.Critical, func() {
 		By("Create break glass credential")
-		clusterID = "2m78k5rf2qcmqcu825gp0mne78sra4j1"
 		bgcArgs := &exe.BreakGlassCredentialArgs{
 			Cluster: helper.StringPointer(clusterID),
 		}
@@ -74,6 +75,8 @@ var _ = Describe("Break Glass Credential", ci.Day2, ci.FeatureBreakGlassCredenti
 		Expect(err).ToNot(HaveOccurred())
 
 		By("Create break glass credential with custom arguments")
+		// the break glass credential can only be revoked but not removed
+		// so we use a random username to avoid conflicts
 		username := base32.StdEncoding.EncodeToString(ksuid.New().Bytes())
 		bgcArgs = &exe.BreakGlassCredentialArgs{
 			Cluster:            helper.StringPointer(clusterID),
@@ -90,7 +93,7 @@ var _ = Describe("Break Glass Credential", ci.Day2, ci.FeatureBreakGlassCredenti
 		Logger.Infof("Successfully verified break glass credential can be created for cluster %s", clusterID)
 	})
 
-	It("Verify break glass credential creation is validated correctly - [id:break-glass-credential-02]", ci.Day2, ci.Critical, func() {
+	It("Verify break glass credential creation is validated correctly - [id:break-glass-credential-02]", ci.Day2, ci.Medium, func() {
 		By("Create break glass credential with invalid username")
 		bgcArgs := &exe.BreakGlassCredentialArgs{
 			Cluster:  helper.StringPointer(clusterID),
